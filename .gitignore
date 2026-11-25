@@ -1,0 +1,23 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+.env
+.env.*
+!.env.example
+
+# .NET
+bin/
+obj/
+*.user
+.vs/
+*.db
+*.db-shm
+*.db-wal
+
+# upload ảnh khi chạy local
+api/wwwroot/uploads/
+
+# công cụ
+.vite/
+*.log
