@@ -6,6 +6,7 @@ using AzureStay.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -59,6 +60,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<JwtTokenService>();
 builder.Services.AddScoped<AvailabilityService>();
 builder.Services.AddScoped<BookingService>();
+builder.Services.AddScoped<SlugService>();
 
 // Cấu hình xác thực JWT HS256, giữ nguyên tên claim sub / email / role theo SPEC.
 var jwtKey = builder.Configuration["Jwt:Key"]
@@ -115,6 +117,9 @@ builder.Services.AddCors(options => options.AddPolicy("spa", policy =>
           .AllowAnyMethod()
           .AllowCredentials()));
 
+var webRootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+Directory.CreateDirectory(webRootPath);
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -123,6 +128,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(webRootPath)
+});
 app.UseCors("spa");
 app.UseAuthentication();
 app.UseAuthorization();

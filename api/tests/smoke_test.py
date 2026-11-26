@@ -37,6 +37,7 @@ def main() -> int:
         timeout=10,
     )
     reg_body = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+    smoke_user_id = reg_body.get("id")
     ok_reg = (
         r.status_code == 201
         and reg_body.get("email") == unique_email
@@ -355,6 +356,280 @@ def main() -> int:
         default=-1,
     )
     record("Availability restored after cancel", avail_after == avail_before, f"before={avail_before}, after={avail_after}")
+
+    # ==========================================================
+    # Nhóm 1C: Owner, Admin, Upload ảnh, Thống kê
+    # ==========================================================
+    admin_token = seed_tokens.get("admin@azurestay.vn", "")
+    owner_a_token = seed_tokens.get("owner@azurestay.vn", "")
+    headers_admin = {"Authorization": f"Bearer {admin_token}"}
+    headers_owner_a = {"Authorization": f"Bearer {owner_a_token}"}
+
+    r = requests.post(
+        f"{BASE_URL}/api/auth/login",
+        json={"email": "owner2@azurestay.vn", "password": "Owner@12345"},
+        timeout=10,
+    )
+    owner_b_token = r.json().get("accessToken", "") if r.status_code == 200 else ""
+    headers_owner_b = {"Authorization": f"Bearer {owner_b_token}"}
+
+    # 28. Phân quyền 401 / 403 cho Owner & Admin
+    r = requests.get(f"{BASE_URL}/api/owner/hotels", timeout=10)
+    record("GET /api/owner/hotels without token -> 401", r.status_code == 401, f"code={r.status_code}")
+
+    r = requests.get(f"{BASE_URL}/api/owner/hotels", headers=headers_a, timeout=10)
+    record("GET /api/owner/hotels as Customer -> 403", r.status_code == 403, f"code={r.status_code}")
+
+    r = requests.get(f"{BASE_URL}/api/admin/users", timeout=10)
+    record("GET /api/admin/users without token -> 401", r.status_code == 401, f"code={r.status_code}")
+
+    r = requests.get(f"{BASE_URL}/api/admin/users", headers=headers_owner_a, timeout=10)
+    record("GET /api/admin/users as Owner -> 403", r.status_code == 403, f"code={r.status_code}")
+
+    # 29. Owner A tạo khách sạn -> 201 Pending; Owner B PUT -> 404; Owner B GET list không thấy
+    hotel_suffix = int(time.time() * 1000)
+    new_hotel_name = f"Khách Sạn Bình Minh {hotel_suffix}"
+    hotel_payload = {
+        "name": new_hotel_name,
+        "city": "Đà Nẵng",
+        "district": "Ngũ Hành Sơn",
+        "address": "99 Trường Sa, Quận Ngũ Hành Sơn, Đà Nẵng",
+        "description": "Khách sạn mới tạo để kiểm thử Phase 1C.",
+        "starRating": 4,
+        "amenities": "wifi,pool,parking",
+    }
+    r = requests.post(f"{BASE_URL}/api/owner/hotels", headers=headers_owner_a, json=hotel_payload, timeout=10)
+    created_hotel = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+    new_hotel_id = created_hotel.get("id")
+    new_hotel_slug = created_hotel.get("slug")
+    ok_create_hotel = (
+        r.status_code == 201
+        and bool(new_hotel_id)
+        and bool(new_hotel_slug)
+        and created_hotel.get("status") == "Pending"
+        and created_hotel.get("featured") is False
+    )
+    record("POST /api/owner/hotels -> 201 Pending", ok_create_hotel, f"code={r.status_code}, id={new_hotel_id}")
+
+    r = requests.put(
+        f"{BASE_URL}/api/owner/hotels/{new_hotel_id}",
+        headers=headers_owner_b,
+        json=dict(hotel_payload, name="Chiếm Quyền Sửa"),
+        timeout=10,
+    )
+    record("PUT /api/owner/hotels/{id} by Owner B -> 404", r.status_code == 404, f"code={r.status_code}")
+
+    r = requests.get(
+        f"{BASE_URL}/api/owner/hotels",
+        headers=headers_owner_b,
+        params={"q": new_hotel_name, "pageSize": 50},
+        timeout=10,
+    )
+    owner_b_items = r.json().get("items", []) if r.status_code == 200 else []
+    ok_owner_b_hidden = r.status_code == 200 and not any(item.get("id") == new_hotel_id for item in owner_b_items)
+    record("GET /api/owner/hotels by Owner B hides Owner A hotel", ok_owner_b_hidden, f"code={r.status_code}")
+
+    # 30. Owner A gửi status: "Active" trong PUT -> vẫn Pending
+    r = requests.put(
+        f"{BASE_URL}/api/owner/hotels/{new_hotel_id}",
+        headers=headers_owner_a,
+        json=dict(hotel_payload, status="Active", featured=True),
+        timeout=10,
+    )
+    updated_hotel = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+    ok_ignore_status = r.status_code == 200 and updated_hotel.get("status") == "Pending" and updated_hotel.get("featured") is False
+    record("PUT /api/owner/hotels/{id} ignores status/featured from client -> stays Pending", ok_ignore_status, f"code={r.status_code}, status={updated_hotel.get('status')}")
+
+    # Tạo loại phòng + kiểm tra lịch trống cho khách sạn mới
+    r = requests.post(
+        f"{BASE_URL}/api/owner/hotels/{new_hotel_id}/room-types",
+        headers=headers_owner_a,
+        json={
+            "name": "Deluxe Smoke Test",
+            "bedType": "1 Giường King",
+            "viewType": "Hướng biển",
+            "hasBathtub": True,
+            "maxAdults": 2,
+            "maxChildren": 1,
+            "sizeM2": 32,
+            "pricePerNight": 1500000,
+            "totalRooms": 5,
+            "description": "Phòng kiểm thử",
+            "amenities": "wifi,tv",
+        },
+        timeout=10,
+    )
+    rt_body = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+    new_rt_id = rt_body.get("id")
+    ok_create_rt = r.status_code == 201 and bool(new_rt_id) and rt_body.get("available") == 5
+    record("POST /api/owner/hotels/{id}/room-types -> 201", ok_create_rt, f"code={r.status_code}")
+
+    # 31. Admin duyệt Active -> xuất hiện công khai; tạm ngưng Suspended -> biến mất + GET slug -> 404
+    r = requests.put(
+        f"{BASE_URL}/api/admin/hotels/{new_hotel_id}/status",
+        headers=headers_admin,
+        json={"status": "Active"},
+        timeout=10,
+    )
+    ok_approve = r.status_code == 200 and r.json().get("status") == "Active"
+    record("PUT /api/admin/hotels/{id}/status Active -> 200", ok_approve, f"code={r.status_code}")
+
+    r = requests.get(f"{BASE_URL}/api/hotels", params={"q": new_hotel_name, "pageSize": 20}, timeout=10)
+    pub_items = r.json().get("items", []) if r.status_code == 200 else []
+    ok_pub_visible = r.status_code == 200 and any(item.get("id") == new_hotel_id for item in pub_items)
+    record("GET /api/hotels shows approved hotel", ok_pub_visible, f"code={r.status_code}")
+
+    r = requests.put(
+        f"{BASE_URL}/api/admin/hotels/{new_hotel_id}/status",
+        headers=headers_admin,
+        json={"status": "Suspended"},
+        timeout=10,
+    )
+    ok_suspend = r.status_code == 200 and r.json().get("status") == "Suspended"
+    record("PUT /api/admin/hotels/{id}/status Suspended -> 200", ok_suspend, f"code={r.status_code}")
+
+    r = requests.get(f"{BASE_URL}/api/hotels", params={"q": new_hotel_name, "pageSize": 20}, timeout=10)
+    pub_after_suspend = r.json().get("items", []) if r.status_code == 200 else []
+    ok_pub_hidden = r.status_code == 200 and not any(item.get("id") == new_hotel_id for item in pub_after_suspend)
+    record("GET /api/hotels hides suspended hotel", ok_pub_hidden, f"code={r.status_code}")
+
+    r = requests.get(f"{BASE_URL}/api/hotels/{new_hotel_slug}", timeout=10)
+    record("GET /api/hotels/{slug} for suspended hotel -> 404", r.status_code == 404, f"code={r.status_code}")
+
+    # 32. Admin tự hạ quyền chính mình -> 400
+    r = requests.get(f"{BASE_URL}/api/auth/me", headers=headers_admin, timeout=10)
+    admin_id = r.json().get("id", 1) if r.status_code == 200 else 1
+    r = requests.put(
+        f"{BASE_URL}/api/admin/users/{admin_id}/role",
+        headers=headers_admin,
+        json={"role": "Customer"},
+        timeout=10,
+    )
+    record("PUT /api/admin/users/{self}/role Customer -> 400", r.status_code == 400, f"code={r.status_code}")
+
+    # 33. Admin khoá customer -> login 403; mở lại -> login 200
+    r = requests.put(
+        f"{BASE_URL}/api/admin/users/{smoke_user_id}",
+        headers=headers_admin,
+        json={"fullName": "Tên Đã Cập Nhật", "phone": "0911222333", "status": "Locked"},
+        timeout=10,
+    )
+    ok_lock = r.status_code == 200 and r.json().get("status") == "Locked"
+    record("PUT /api/admin/users/{id} Locked -> 200", ok_lock, f"code={r.status_code}")
+
+    r = requests.post(
+        f"{BASE_URL}/api/auth/login",
+        json={"email": unique_email, "password": password_v2},
+        timeout=10,
+    )
+    record("Locked customer login -> 403", r.status_code == 403, f"code={r.status_code}")
+
+    r = requests.put(
+        f"{BASE_URL}/api/admin/users/{smoke_user_id}",
+        headers=headers_admin,
+        json={"fullName": "Tên Đã Cập Nhật", "phone": "0911222333", "status": "Active"},
+        timeout=10,
+    )
+    ok_unlock = r.status_code == 200 and r.json().get("status") == "Active"
+    record("PUT /api/admin/users/{id} Active -> 200", ok_unlock, f"code={r.status_code}")
+
+    r = requests.post(
+        f"{BASE_URL}/api/auth/login",
+        json={"email": unique_email, "password": password_v2},
+        timeout=10,
+    )
+    record("Unlocked customer login -> 200", r.status_code == 200, f"code={r.status_code}")
+
+    # 34. Owner đổi trạng thái đơn: Pending -> CheckedIn (400); Pending -> Confirmed (200)
+    b_in = (vn_today + timedelta(days=45)).isoformat()
+    b_out = (vn_today + timedelta(days=47)).isoformat()
+    r = requests.post(
+        f"{BASE_URL}/api/bookings",
+        headers=headers_a,
+        json=dict(booking_payload, checkIn=b_in, checkOut=b_out, note="Test owner transition"),
+        timeout=10,
+    )
+    owner_test_booking_id = r.json().get("id") if r.status_code == 201 else None
+
+    r = requests.put(
+        f"{BASE_URL}/api/owner/bookings/{owner_test_booking_id}/status",
+        headers=headers_owner_a,
+        json={"status": "CheckedIn"},
+        timeout=10,
+    )
+    record("PUT /api/owner/bookings/{id}/status Pending->CheckedIn -> 400", r.status_code == 400, f"code={r.status_code}")
+
+    r = requests.put(
+        f"{BASE_URL}/api/owner/bookings/{owner_test_booking_id}/status",
+        headers=headers_owner_a,
+        json={"status": "Confirmed"},
+        timeout=10,
+    )
+    ok_confirm = r.status_code == 200 and r.json().get("status") == "Confirmed"
+    record("PUT /api/owner/bookings/{id}/status Pending->Confirmed -> 200", ok_confirm, f"code={r.status_code}")
+
+    # Huỷ đơn vừa test để không giữ tồn kho qua các lần chạy smoke test
+    requests.put(
+        f"{BASE_URL}/api/owner/bookings/{owner_test_booking_id}/status",
+        headers=headers_owner_a,
+        json={"status": "Cancelled", "note": "Dọn dẹp sau smoke test"},
+        timeout=10,
+    )
+
+    # 35. Upload ảnh: .txt -> 400; .png hợp lệ -> 201 và GET URL trả 200
+    r = requests.post(
+        f"{BASE_URL}/api/uploads",
+        headers=headers_owner_a,
+        files={"file": ("not_image.txt", b"hello azurestay", "text/plain")},
+        timeout=10,
+    )
+    record("POST /api/uploads .txt -> 400", r.status_code == 400, f"code={r.status_code}")
+
+    # PNG 1x1 tối thiểu hợp lệ
+    minimal_png = (
+        b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01"
+        b"\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDATx\x9cc\xf8\xcf\xc0"
+        b"\x00\x00\x03\x01\x01\x00\xc9\xfe\x92\xef\x00\x00\x00\x00IEND\xaeB`\x82"
+    )
+    r = requests.post(
+        f"{BASE_URL}/api/uploads",
+        headers=headers_owner_a,
+        files={"file": ("smoke.png", minimal_png, "image/png")},
+        timeout=10,
+    )
+    upload_body = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+    uploaded_url = upload_body.get("url", "")
+    ok_upload = r.status_code == 201 and uploaded_url.startswith("/uploads/")
+    record("POST /api/uploads .png -> 201", ok_upload, f"code={r.status_code}, url={uploaded_url}")
+
+    r = requests.get(f"{BASE_URL}{uploaded_url}", timeout=10) if uploaded_url else None
+    ok_get_upload = r is not None and r.status_code == 200 and r.content.startswith(b"\x89PNG")
+    record("GET uploaded static file -> 200", ok_get_upload, f"code={r.status_code if r else 'N/A'}")
+
+    # 36. Thống kê Owner & Admin trả 200 với các trường số không âm
+    r = requests.get(f"{BASE_URL}/api/owner/stats", headers=headers_owner_a, timeout=10)
+    o_stats = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+    ok_owner_stats = (
+        r.status_code == 200
+        and o_stats.get("totalRevenue", -1) >= 0
+        and o_stats.get("totalBookings", -1) >= 0
+        and o_stats.get("soldRoomNights", -1) >= 0
+        and isinstance(o_stats.get("roomTypeOccupancy"), list)
+        and isinstance(o_stats.get("topRoomTypes"), list)
+    )
+    record("GET /api/owner/stats -> 200 non-negative fields", ok_owner_stats, f"code={r.status_code}")
+
+    r = requests.get(f"{BASE_URL}/api/admin/stats", headers=headers_admin, timeout=10)
+    a_stats = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+    ok_admin_stats = (
+        r.status_code == 200
+        and a_stats.get("totalUsers", -1) >= 0
+        and a_stats.get("totalHotels", -1) >= 0
+        and a_stats.get("totalPaidRevenue", -1) >= 0
+        and a_stats.get("totalBookings", -1) >= 0
+        and isinstance(a_stats.get("topHotels"), list)
+    )
+    record("GET /api/admin/stats -> 200 non-negative fields", ok_admin_stats, f"code={r.status_code}")
 
     failed = sum(1 for ok in results if not ok)
     print(f"\nTong ket: {len(results) - failed}/{len(results)} PASS, {failed} FAIL")

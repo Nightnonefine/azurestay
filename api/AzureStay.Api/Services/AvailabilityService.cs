@@ -71,6 +71,25 @@ public class AvailabilityService
         return result;
     }
 
+    // Đếm tổng số phòng đang giữ/đã đặt trong một ngày cụ thể theo từng loại phòng (dùng cho màn Owner).
+    public async Task<Dictionary<int, int>> CountBookedOnDateAsync(
+        IReadOnlyCollection<int> roomTypeIds,
+        DateOnly date,
+        CancellationToken ct = default)
+    {
+        var result = new Dictionary<int, int>();
+        if (roomTypeIds.Count == 0)
+            return result;
+
+        var bookings = await QueryOverlappingActiveBookings(
+            roomTypeIds, date, date.AddDays(1), null, ct);
+
+        foreach (var b in bookings)
+            result[b.RoomTypeId] = result.GetValueOrDefault(b.RoomTypeId) + b.Rooms;
+
+        return result;
+    }
+
     // Dựng lưới tồn kho theo từng ngày trong khoảng [from, to) cho một khách sạn.
     public async Task<List<DailyAvailabilityDto>> GetHotelAvailabilityAsync(
         int hotelId,
