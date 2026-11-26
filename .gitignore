@@ -15,9 +15,8 @@ obj/
 *.db-shm
 *.db-wal
 
-# upload ảnh khi chạy local
-api/wwwroot/uploads/
+# upload anh khi chay local
+api/**/wwwroot/uploads/
 
-# công cụ
 .vite/
 *.log
