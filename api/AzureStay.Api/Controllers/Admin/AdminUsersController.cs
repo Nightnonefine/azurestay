@@ -116,6 +116,14 @@ public class AdminUsersController : ControllerBase
         if (matchedStatus is null)
             return BadRequest(new { message = "Trạng thái tài khoản chỉ nhận Active hoặc Locked." });
 
+        // Chặn admin tự khoá chính mình: nếu không sẽ không còn ai quản trị hệ thống.
+        var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+        if (currentUserId is null)
+            return Unauthorized(new { message = "Phiên đăng nhập không hợp lệ." });
+
+        if (id == currentUserId.Value && string.Equals(matchedStatus, UserStatuses.Locked, StringComparison.Ordinal))
+            return BadRequest(new { message = "Bạn không thể khoá tài khoản của chính mình." });
+
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id, ct);
         if (user is null)
             return NotFound(new { message = "Không tìm thấy người dùng." });

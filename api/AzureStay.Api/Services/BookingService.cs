@@ -26,8 +26,6 @@ public sealed record ServiceResult<T>(
 public class BookingService
 {
     public const int MaxNightsPerBooking = 30;
-    private const string CodeAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Tránh ký tự dễ nhầm lẫn nhưng vẫn thuộc A-Z0-9.
-    private const int BookingCodeLength = 8;
 
     private static readonly TimeZoneInfo VietnamTimeZone = ResolveVietnamTimeZone();
     private static readonly HashSet<string> ValidStatuses = new(StringComparer.OrdinalIgnoreCase)
@@ -332,11 +330,8 @@ public class BookingService
     {
         for (var attempt = 0; attempt < 10; attempt++)
         {
-            var chars = new char[BookingCodeLength];
-            for (var i = 0; i < chars.Length; i++)
-                chars[i] = CodeAlphabet[RandomNumberGenerator.GetInt32(CodeAlphabet.Length)];
-
-            var candidate = new string(chars);
+            // Mã đơn dạng AZS + 5 chữ số, đồng bộ với dữ liệu seed (AZS10001).
+            var candidate = "AZS" + RandomNumberGenerator.GetInt32(100000).ToString("D5");
             var exists = await _db.Bookings.AnyAsync(b => b.Code == candidate, ct);
             if (!exists)
                 return candidate;
