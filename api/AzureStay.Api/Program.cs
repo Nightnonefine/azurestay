@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using AzureStay.Api.Data;
 using AzureStay.Api.Security;
+using AzureStay.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -56,6 +57,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddScoped<JwtTokenService>();
+builder.Services.AddScoped<AvailabilityService>();
+builder.Services.AddScoped<BookingService>();
 
 // Cấu hình xác thực JWT HS256, giữ nguyên tên claim sub / email / role theo SPEC.
 var jwtKey = builder.Configuration["Jwt:Key"]

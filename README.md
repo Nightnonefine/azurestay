@@ -42,21 +42,34 @@ Tài khoản seed: `admin@azurestay.vn / Admin@12345`, `owner@azurestay.vn / Own
 Biến môi trường cần khi deploy: `ConnectionStrings__Default`, `Jwt__Key`, `Vnpay__TMNCode`, `Vnpay__HashSecret`.
 `Jwt:Key` trong `appsettings.json` chỉ là khoá dev — **phải đổi khi deploy**.
 
+## API hiện có
+
+| Nhóm | Endpoint |
+|---|---|
+| Auth | `POST /api/auth/register\|login\|refresh\|logout\|change-password`, `GET/PUT /api/auth/me` |
+| Meta | `GET /api/meta/cities`, `GET /api/meta/amenities` |
+| Khách sạn | `GET /api/hotels?city&q&minPrice&maxPrice&stars&amenities&checkIn&checkOut&guests&sort&page&pageSize`, `GET /api/hotels/{slug}`, `GET /api/hotels/{slug}/availability?from&to`, `GET /api/hotels/{slug}/reviews` |
+| Đặt phòng | `POST /api/bookings`, `GET /api/bookings/my`, `GET /api/bookings/{code}`, `POST /api/bookings/{id}/cancel` |
+| Hạ tầng | `GET /api/health` |
+
 ## Tiến độ
 
 | Phase | Nội dung | Trạng thái |
 |---|---|---|
 | 1A | Schema + JWT auth + seed | XONG — 17/17 smoke test PASS |
-| 1B | Hotels / RoomTypes / availability / bookings | đang làm |
-| 1C | Owner + Admin API, upload, thống kê | chưa |
+| 1B | Hotels / RoomTypes / availability / bookings | XONG — 38/38 smoke test + 24/24 kiểm tra độc lập PASS |
+| 1C | Owner + Admin API, upload, thống kê | đang làm |
 | 2A | Frontend công khai + tài khoản khách | chưa |
 | 2B | Frontend owner + admin | chưa |
 | 3 | VNPay sandbox + Docker + hosting | chưa |
 
-## Ghi chú kỹ thuật đã chốt ở phase 1A
+## Ghi chú kỹ thuật đã chốt
 
 - JWT HS256 60 phút (claim `sub`, `email`, `role`), refresh token 64 byte lưu bảng `RefreshTokens`, xoay vòng mỗi lần refresh, cookie httpOnly.
 - Mật khẩu: PBKDF2-SHA256 100.000 vòng, salt riêng, so sánh `FixedTimeEquals`.
 - Sai email và sai mật khẩu trả cùng một 401; tài khoản `Locked` trả 403.
-- Seed dữ liệu nằm ở `Data/SeedData.cs` (idempotent — chạy lại không nhân đôi dữ liệu).
-- Hằng số trạng thái tập trung ở `Models/Constants.cs` (`UserRoles`, `UserStatuses`, `HotelStatuses`, `BookingStatuses`).
+- Tồn kho **tính từ booking** (`Services/AvailabilityService.cs`):
+  `available = TotalRooms − Σ bookings chồng lấn ngày`, chỉ tính đơn `Pending` (giữ chỗ 30 phút) / `Confirmed` / `CheckedIn`.
+- Đặt phòng đi qua `Services/BookingService.cs`: kiểm tra ngày, sức chứa, tồn kho; chụp giá; mã đơn 8 ký tự; mọi chuyển trạng thái ở một chỗ.
+- Người khác đọc đơn của mình → 404 (không phải 403) để không lộ mã đơn có tồn tại.
+- Seed dữ liệu ở `Data/SeedData.cs` (idempotent); hằng số trạng thái ở `Models/Constants.cs`.
