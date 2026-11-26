@@ -34,6 +34,11 @@ export default function Navbar() {
     navigate('/');
   }
 
+  const isOwner = user?.role === 'Owner';
+  const isAdmin = user?.role === 'Admin';
+  // Phân quyền hiển thị menu khu vực Owner/Admin dựa trên role lấy từ /auth/me.
+  const canAccessOwner = isOwner || isAdmin;
+
   const initials = (user?.fullName || user?.email || 'K')
     .trim()
     .split(/\s+/)
@@ -64,6 +69,16 @@ export default function Navbar() {
           <NavLink to="/contact" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
             Liên hệ
           </NavLink>
+          {canAccessOwner && (
+            <NavLink to="/owner" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+              Kênh chủ khách sạn
+            </NavLink>
+          )}
+          {isAdmin && (
+            <NavLink to="/admin" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+              Quản trị
+            </NavLink>
+          )}
         </nav>
 
         <div className="nav-actions">
@@ -92,6 +107,16 @@ export default function Navbar() {
                   <Link to="/account/bookings" className="user-dropdown-item" role="menuitem">
                     Đơn của tôi
                   </Link>
+                  {canAccessOwner && (
+                    <Link to="/owner" className="user-dropdown-item" role="menuitem">
+                      Kênh chủ khách sạn
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <Link to="/admin" className="user-dropdown-item" role="menuitem">
+                      Quản trị hệ thống
+                    </Link>
+                  )}
                   <button
                     type="button"
                     className="user-dropdown-item danger"
@@ -140,6 +165,16 @@ export default function Navbar() {
           <NavLink to="/contact" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
             Liên hệ
           </NavLink>
+          {canAccessOwner && (
+            <NavLink to="/owner" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+              Kênh chủ khách sạn
+            </NavLink>
+          )}
+          {isAdmin && (
+            <NavLink to="/admin" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
+              Quản trị
+            </NavLink>
+          )}
 
           <div className="mobile-drawer-actions">
             {isAuthenticated ? (

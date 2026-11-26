@@ -632,12 +632,16 @@
   color: #6d28d9;
 }
 
-.status-badge.completed {
+.status-badge.completed,
+.status-badge.active {
   background: var(--success-bg);
   color: var(--teal-dark);
 }
 
-.status-badge.cancelled {
+.status-badge.cancelled,
+.status-badge.suspended,
+.status-badge.rejected,
+.status-badge.locked {
   background: var(--danger-bg);
   color: var(--danger);
 }

@@ -2,7 +2,7 @@
 
 Đồ án Lập trình Web (PTIT HCM, đề tài số 2) — bản **website dùng thật**, không phải demo.
 
-- Frontend: React 19 + Vite + react-router (CSS thuần) — *chưa làm, phase 2A*
+- Frontend: React 19 + Vite + react-router (CSS thuần) — giao diện khách, chủ khách sạn và quản trị
 - Backend: ASP.NET Core 8 Web API + EF Core 8 + SQL Server
 - Ba vai trò: Khách (`Customer`) — Chủ khách sạn (`Owner`) — Quản trị (`Admin`)
 - Đặc tả đầy đủ: [docs/SPEC.md](docs/SPEC.md) — đọc trước khi sửa bất cứ thứ gì.
@@ -28,6 +28,13 @@ dotnet ef database update      # tạo AzureStayDb + seed dữ liệu
 # chạy API
 cd api\AzureStay.Api
 dotnet run                     # http://localhost:5080/swagger
+```
+
+Chạy giao diện web (cửa sổ khác, ở thư mục gốc repo):
+
+```powershell
+npm install
+npm run dev -- --port 3000   # http://localhost:3000
 ```
 
 Test API khi server đang chạy:
@@ -58,10 +65,10 @@ Biến môi trường cần khi deploy: `ConnectionStrings__Default`, `Jwt__Key`
 |---|---|---|
 | 1A | Schema + JWT auth + seed | XONG — 17/17 smoke test PASS |
 | 1B | Hotels / RoomTypes / availability / bookings | XONG — 38/38 smoke test + 24/24 kiểm tra độc lập PASS |
-| 1C | Owner + Admin API, upload, thống kê | đang làm |
-| 2A | Frontend công khai + tài khoản khách | chưa |
-| 2B | Frontend owner + admin | chưa |
-| 3 | VNPay sandbox + Docker + hosting | chưa |
+| 1C | Owner + Admin API, upload, thống kê | XONG — 64/64 smoke test + 38/38 kiểm tra độc lập PASS |
+| 2A | Frontend công khai + tài khoản khách | XONG — build + lint sạch, kiểm tra bằng ảnh chụp headless |
+| 2B | Frontend owner + admin | XONG — build + lint sạch, 8 màn hình chụp headless có đăng nhập |
+| 3 | VNPay sandbox + Docker + hosting | đang làm |
 
 ## Ghi chú kỹ thuật đã chốt
 

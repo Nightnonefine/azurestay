@@ -1,9 +1,9 @@
 import { statusLabel, statusVariant } from '../utils/format';
 
-export default function StatusBadge({ status }) {
+export default function StatusBadge({ status, label = '' }) {
   return (
     <span className={`status-badge ${statusVariant(status)}`}>
-      {statusLabel(status)}
+      {label || statusLabel(status)}
     </span>
   );
 }

@@ -135,4 +135,48 @@ export const bookingApi = {
   cancel: (id, payload = {}) => api.post(`/bookings/${id}/cancel`, payload).then((r) => r.data),
 };
 
+export const uploadApi = {
+  image: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/uploads', formData).then((r) => r.data);
+  },
+};
+
+export const ownerApi = {
+  hotels: (params) => api.get('/owner/hotels', { params: cleanParams(params) }).then((r) => r.data),
+  createHotel: (payload) => api.post('/owner/hotels', payload).then((r) => r.data),
+  updateHotel: (id, payload) => api.put(`/owner/hotels/${id}`, payload).then((r) => r.data),
+  addHotelImage: (id, payload) => api.post(`/owner/hotels/${id}/images`, payload).then((r) => r.data),
+  deleteHotelImage: (id, imageId) =>
+    api.delete(`/owner/hotels/${id}/images/${imageId}`).then((r) => r.data),
+  roomTypes: (hotelId) => api.get(`/owner/hotels/${hotelId}/room-types`).then((r) => r.data),
+  createRoomType: (hotelId, payload) =>
+    api.post(`/owner/hotels/${hotelId}/room-types`, payload).then((r) => r.data),
+  updateRoomType: (id, payload) => api.put(`/owner/room-types/${id}`, payload).then((r) => r.data),
+  deleteRoomType: (id) => api.delete(`/owner/room-types/${id}`).then((r) => r.data),
+  addRoomTypeImage: (id, payload) =>
+    api.post(`/owner/room-types/${id}/images`, payload).then((r) => r.data),
+  deleteRoomTypeImage: (id, imageId) =>
+    api.delete(`/owner/room-types/${id}/images/${imageId}`).then((r) => r.data),
+  calendar: (hotelId, params) =>
+    api.get(`/owner/hotels/${hotelId}/calendar`, { params: cleanParams(params) }).then((r) => r.data),
+  bookings: (params) => api.get('/owner/bookings', { params: cleanParams(params) }).then((r) => r.data),
+  updateBookingStatus: (id, payload) =>
+    api.put(`/owner/bookings/${id}/status`, payload).then((r) => r.data),
+  stats: (params) => api.get('/owner/stats', { params: cleanParams(params) }).then((r) => r.data),
+};
+
+export const adminApi = {
+  users: (params) => api.get('/admin/users', { params: cleanParams(params) }).then((r) => r.data),
+  updateUser: (id, payload) => api.put(`/admin/users/${id}`, payload).then((r) => r.data),
+  updateUserRole: (id, payload) => api.put(`/admin/users/${id}/role`, payload).then((r) => r.data),
+  hotels: (params) => api.get('/admin/hotels', { params: cleanParams(params) }).then((r) => r.data),
+  updateHotelStatus: (id, payload) =>
+    api.put(`/admin/hotels/${id}/status`, payload).then((r) => r.data),
+  toggleFeatured: (id, payload = {}) =>
+    api.put(`/admin/hotels/${id}/featured`, payload).then((r) => r.data),
+  stats: () => api.get('/admin/stats').then((r) => r.data),
+};
+
 export default api;

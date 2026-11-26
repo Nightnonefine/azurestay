@@ -126,3 +126,84 @@ export function validateBooking({
 
   return errors;
 }
+
+// Kiểm tra dữ liệu biểu mẫu tạo/sửa khách sạn phía client.
+export function validateHotel({ name, city, district, address, starRating, description }) {
+  const errors = {};
+  const cleanName = String(name || '').trim();
+  const cleanCity = String(city || '').trim();
+  const cleanDistrict = String(district || '').trim();
+  const cleanAddress = String(address || '').trim();
+  const cleanDesc = String(description || '').trim();
+  const stars = Number(starRating);
+
+  if (cleanName.length < 2 || cleanName.length > 200) {
+    errors.name = 'Tên khách sạn phải từ 2 đến 200 ký tự.';
+  }
+  if (cleanCity.length < 2 || cleanCity.length > 100) {
+    errors.city = 'Vui lòng chọn thành phố.';
+  }
+  if (!cleanDistrict || cleanDistrict.length > 100) {
+    errors.district = 'Vui lòng nhập quận/huyện (tối đa 100 ký tự).';
+  }
+  if (cleanAddress.length < 2 || cleanAddress.length > 300) {
+    errors.address = 'Địa chỉ khách sạn phải từ 2 đến 300 ký tự.';
+  }
+  if (!Number.isInteger(stars) || stars < 1 || stars > 5) {
+    errors.starRating = 'Hạng sao phải từ 1 đến 5.';
+  }
+  if (cleanDesc.length > 4000) {
+    errors.description = 'Mô tả không được vượt quá 4000 ký tự.';
+  }
+
+  return errors;
+}
+
+// Kiểm tra dữ liệu biểu mẫu tạo/sửa loại phòng phía client.
+export function validateRoomType({
+  name,
+  bedType,
+  maxAdults,
+  maxChildren,
+  sizeM2,
+  pricePerNight,
+  totalRooms,
+}) {
+  const errors = {};
+  const cleanName = String(name || '').trim();
+  const cleanBed = String(bedType || '').trim();
+
+  if (cleanName.length < 2 || cleanName.length > 150) {
+    errors.name = 'Tên loại phòng phải từ 2 đến 150 ký tự.';
+  }
+  if (!cleanBed || cleanBed.length > 80) {
+    errors.bedType = 'Vui lòng nhập loại giường (tối đa 80 ký tự).';
+  }
+
+  const adults = Number(maxAdults);
+  if (!Number.isInteger(adults) || adults < 1 || adults > 20) {
+    errors.maxAdults = 'Số người lớn tối đa phải từ 1 đến 20.';
+  }
+
+  const children = Number(maxChildren);
+  if (!Number.isInteger(children) || children < 0 || children > 20) {
+    errors.maxChildren = 'Số trẻ em tối đa phải từ 0 đến 20.';
+  }
+
+  const size = Number(sizeM2);
+  if (!Number.isInteger(size) || size < 5 || size > 1000) {
+    errors.sizeM2 = 'Diện tích phòng phải từ 5 đến 1000 m².';
+  }
+
+  const price = Number(pricePerNight);
+  if (!Number.isFinite(price) || price < 1000 || price > 1000000000) {
+    errors.pricePerNight = 'Giá mỗi đêm phải từ 1.000 ₫ trở lên.';
+  }
+
+  const rooms = Number(totalRooms);
+  if (!Number.isInteger(rooms) || rooms < 1 || rooms > 1000) {
+    errors.totalRooms = 'Tổng số phòng phải từ 1 đến 1000.';
+  }
+
+  return errors;
+}

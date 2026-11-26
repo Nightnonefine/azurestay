@@ -47,6 +47,28 @@ const STATUS_LABELS = {
   CheckedIn: 'Đã nhận phòng',
   Completed: 'Hoàn thành',
   Cancelled: 'Đã huỷ',
+  Active: 'Đang hoạt động',
+  Suspended: 'Tạm ngưng',
+  Rejected: 'Từ chối',
+  Locked: 'Đã khoá',
+};
+
+const HOTEL_STATUS_LABELS = {
+  Pending: 'Chờ duyệt',
+  Active: 'Đang hoạt động',
+  Suspended: 'Tạm ngưng',
+  Rejected: 'Từ chối',
+};
+
+const USER_STATUS_LABELS = {
+  Active: 'Hoạt động',
+  Locked: 'Đã khoá',
+};
+
+const ROLE_LABELS = {
+  Customer: 'Khách hàng',
+  Owner: 'Chủ khách sạn',
+  Admin: 'Quản trị viên',
 };
 
 const STATUS_VARIANTS = {
@@ -55,14 +77,33 @@ const STATUS_VARIANTS = {
   CheckedIn: 'checked-in',
   Completed: 'completed',
   Cancelled: 'cancelled',
+  Active: 'active',
+  Suspended: 'suspended',
+  Rejected: 'rejected',
+  Locked: 'locked',
 };
 
-// Chuyển mã trạng thái booking sang nhãn tiếng Việt.
+// Chuyển mã trạng thái booking/chung sang nhãn tiếng Việt.
 export function statusLabel(status) {
   return STATUS_LABELS[status] || status || 'Không xác định';
 }
 
-// Trả về class CSS tương ứng với trạng thái booking.
+// Chuyển mã trạng thái khách sạn sang nhãn tiếng Việt.
+export function hotelStatusLabel(status) {
+  return HOTEL_STATUS_LABELS[status] || statusLabel(status);
+}
+
+// Chuyển mã trạng thái tài khoản sang nhãn tiếng Việt.
+export function userStatusLabel(status) {
+  return USER_STATUS_LABELS[status] || statusLabel(status);
+}
+
+// Chuyển mã vai trò người dùng sang nhãn tiếng Việt.
+export function roleLabel(role) {
+  return ROLE_LABELS[role] || role || 'Không xác định';
+}
+
+// Trả về class CSS tương ứng với trạng thái.
 export function statusVariant(status) {
   return STATUS_VARIANTS[status] || 'pending';
 }

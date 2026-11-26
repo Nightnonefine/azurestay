@@ -1,0 +1,613 @@
+/* Kiểu dáng cho khu vực Chủ khách sạn (/owner/*) */
+
+.portal-page {
+  padding: 28px 0 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.portal-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.portal-header h1 {
+  color: var(--navy);
+  font-size: 1.65rem;
+  line-height: 1.25;
+}
+
+.portal-subtitle {
+  color: var(--muted);
+  font-size: 0.94rem;
+  margin-top: 4px;
+}
+
+.portal-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.portal-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.portal-tab {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}
+
+.portal-tab:hover {
+  border-color: var(--navy);
+  color: var(--navy);
+}
+
+.portal-tab.active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #ffffff;
+}
+
+/* Lưới thẻ số liệu KPI */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kpi-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.kpi-value {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.2;
+}
+
+.kpi-value.accent {
+  color: var(--teal-dark);
+}
+
+.kpi-sub {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* Khối card trong khu vực quản trị */
+.portal-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.portal-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.portal-card-head h2 {
+  font-size: 1.15rem;
+  color: var(--navy);
+}
+
+/* Thanh công cụ tìm kiếm / lọc / sắp xếp */
+.toolbar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 12px;
+  align-items: end;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.toolbar-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Bảng dữ liệu chuẩn: header dính, sọc xen kẽ, hover */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: auto;
+  max-height: 68vh;
+}
+
+.portal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.portal-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--sand);
+  color: var(--navy);
+  font-weight: 700;
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.portal-table tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.portal-table tbody tr:nth-child(even) {
+  background: #fafbfd;
+}
+
+.portal-table tbody tr:hover {
+  background: #f0fdfa;
+}
+
+.portal-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-title {
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.table-sub {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.code-pill {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 700;
+  background: var(--sand);
+  color: var(--navy);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  display: inline-block;
+}
+
+/* Form tạo/sửa khách sạn & loại phòng */
+.portal-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.portal-form-full {
+  grid-column: 1 / -1;
+}
+
+.amenities-check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #f8fafc;
+}
+
+.form-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+/* Lưới ảnh khách sạn & loại phòng */
+.image-upload-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--sand);
+  border: 1px dashed #cbd5e1;
+}
+
+.image-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.image-tile {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+}
+
+.image-tile-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: #e2e8f0;
+}
+
+.image-tile-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-primary-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.image-tile-actions {
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Modal form lớn cho loại phòng */
+.modal-card-lg {
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.room-modal-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.room-modal-thumb {
+  position: relative;
+  width: 104px;
+  height: 76px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.room-modal-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.room-modal-thumb button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(15, 43, 70, 0.82);
+  color: #ffffff;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+/* Lịch trống theo ngày */
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  font-size: 0.86rem;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+}
+
+.legend-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+}
+
+.calendar-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.calendar-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+
+.calendar-table th,
+.calendar-table td {
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  padding: 9px 10px;
+  text-align: center;
+  min-width: 68px;
+}
+
+.calendar-table thead th {
+  background: var(--sand);
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.cal-sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: var(--surface);
+  text-align: left !important;
+  min-width: 200px !important;
+  max-width: 240px;
+  box-shadow: 2px 0 6px rgba(15, 43, 70, 0.06);
+}
+
+.calendar-table thead .cal-sticky-col {
+  background: var(--sand);
+  z-index: 4;
+}
+
+.cal-cell-ok {
+  background: #f0fdfa;
+  color: var(--teal-dark);
+  font-weight: 700;
+}
+
+.cal-cell-low {
+  background: var(--warning-bg);
+  color: var(--warning);
+  font-weight: 700;
+}
+
+.cal-cell-empty {
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* Biểu đồ CSS & thanh tiến trình */
+.stats-two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.bar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.bar-row-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.progress-track {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--teal), var(--navy));
+  transition: width 0.25s ease;
+}
+
+.progress-fill.gold {
+  background: linear-gradient(90deg, var(--gold), #d97706);
+}
+
+.progress-fill.danger {
+  background: var(--danger);
+}
+
+.progress-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 130px;
+}
+
+.progress-inline .progress-track {
+  flex: 1;
+}
+
+.hotel-info-dl {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 10px 16px;
+  font-size: 0.94rem;
+}
+
+.hotel-info-dl dt {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.hotel-info-dl dd {
+  margin: 0;
+  color: var(--text);
+}
+
+@media (max-width: 960px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats-two-col,
+  .portal-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-wrap {
+    max-height: none;
+    overflow: visible;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .portal-table thead {
+    display: none;
+  }
+
+  .portal-table,
+  .portal-table tbody,
+  .portal-table tr,
+  .portal-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .portal-table tbody tr {
+    background: var(--surface) !important;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .portal-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: right;
+  }
+
+  .portal-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--muted);
+    font-size: 0.82rem;
+    text-align: left;
+    flex-shrink: 0;
+  }
+
+  .portal-table tbody td:last-child {
+    border-bottom: none;
+    padding-top: 10px;
+    justify-content: flex-end;
+  }
+
+  .table-actions {
+    justify-content: flex-end;
+  }
+
+  .hotel-info-dl {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .hotel-info-dl dt {
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
