@@ -68,7 +68,8 @@ Biến môi trường cần khi deploy: `ConnectionStrings__Default`, `Jwt__Key`
 | 1C | Owner + Admin API, upload, thống kê | XONG — 64/64 smoke test + 38/38 kiểm tra độc lập PASS |
 | 2A | Frontend công khai + tài khoản khách | XONG — build + lint sạch, kiểm tra bằng ảnh chụp headless |
 | 2B | Frontend owner + admin | XONG — build + lint sạch, 8 màn hình chụp headless có đăng nhập |
-| 3 | VNPay sandbox + Docker + hosting | đang làm |
+| 3a | Docker (compose: SQL Server + API + nginx) | XONG — stack chạy, `/api/health` → ok, 8 khách sạn seed |
+| 3b | VNPay sandbox + hosting công khai | chờ khoá VNPay + chốt máy chủ |
 
 ## Ghi chú kỹ thuật đã chốt
 
