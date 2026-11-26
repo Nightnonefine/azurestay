@@ -1,0 +1,7 @@
+node_modules
+dist
+.git
+api/**/bin
+api/**/obj
+api/**/wwwroot/uploads
+*.log

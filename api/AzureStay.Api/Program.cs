@@ -137,4 +137,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+// Khi deploy bằng Docker/hosting: tự áp migration lúc khởi động (bật bằng ApplyMigrations=true).
+if (app.Configuration.GetValue<bool>("ApplyMigrations"))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 app.Run();
