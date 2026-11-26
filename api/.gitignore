@@ -1,0 +1,12 @@
+bin/
+obj/
+*.user
+.vs/
+*.db
+*.db-shm
+*.db-wal
+.env
+.env.*
+!.env.example
+wwwroot/uploads/
+appsettings.Production.json
